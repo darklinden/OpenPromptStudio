@@ -15,7 +15,7 @@ export class DatabaseServer {
     localPromptDefineMap: { [key: string]: IPromptDefineItem } = {}
     notionPromptDefineMap: { [key: string]: IPromptDefineItem } = {}
     isReady: null | Promise<boolean> = null
-    constructor() {}
+    constructor() { }
     async ready() {
         if (this.isReady != null) return this.isReady
         this.isReady = this.init()
@@ -42,13 +42,9 @@ export class DatabaseServer {
         return <any>reuslt
     }
 
-    async getPromptsDefine(options?: { onlyMyNotion?: boolean }) {
+    async getPromptsDefine() {
         await this.ready()
-        if (options?.onlyMyNotion) {
-            return this.notionPromptDefineMap
-        } else {
-            return this.localPromptDefineMap
-        }
+        return this.localPromptDefineMap
     }
 
     async fetchNotion(options: { apiKey: string; databaseId: string }) {

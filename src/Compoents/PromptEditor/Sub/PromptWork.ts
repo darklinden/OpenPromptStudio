@@ -105,7 +105,7 @@ export class PromptWork {
 
     /** 导出提示词 */
     exportPrompts() {
-        return stringifyPrompts(this.groups, { parser: this.data.parser ?? "midjourney" })
+        return stringifyPrompts(this.groups, { parser: this.data.parser ?? "stable-diffusion-webui" })
     }
 
     async reflowPrompts(addPrompt?: string) {
@@ -113,7 +113,7 @@ export class PromptWork {
         if (addPrompt) {
             prompt += " , " + addPrompt
         }
-        await this.importPrompts(prompt, { parser: <any>this.data.parser ?? "midjourney" })
+        await this.importPrompts(prompt, { parser: <any>this.data.parser ?? "stable-diffusion-webui" })
     }
 
     /** 翻译全部提示词 */

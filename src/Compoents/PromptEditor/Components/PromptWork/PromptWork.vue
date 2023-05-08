@@ -5,18 +5,10 @@
             <div class="WorkInfoArea Area">
                 <div class="WorkName"><input type="text" v-model="promptWork.data.name" /></div>
             </div>
-            <textarea
-                class="input"
-                v-model="inputText"
-                placeholder="输入提示词"
-                rows="8"
-                @paste="onUserInputDebounce"
-                @input="onUserInputDebounce"
-                @keydown.enter="onUserInputDebounce"
-                @change="onUserInputDebounce"
-                spellcheck="false"
-            >
-            </textarea>
+            <textarea class="input" v-model="inputText" placeholder="输入提示词" rows="8" @paste="onUserInputDebounce"
+                @input="onUserInputDebounce" @keydown.enter="onUserInputDebounce" @change="onUserInputDebounce"
+                spellcheck="false" />
+
             <div class="output">
                 <div class="pl" v-if="outputText == inputText">输出与输入相同</div>
                 <template v-else> {{ outputText }}</template>
@@ -33,25 +25,17 @@
                         <button @click="doDisableAll()" v-tooltip="'全部禁用'" class="icon">
                             <Icon icon="radix-icons:shadow-none" />
                         </button>
-                        <button
-                            @click="doSwitchIO()"
-                            v-tooltip="'用输出替换输入'"
-                            class="icon"
-                            :class="{ disabled: outputText == inputText }"
-                        >
+                        <button @click="doSwitchIO()" v-tooltip="'用输出替换输入'" class="icon"
+                            :class="{ disabled: outputText == inputText }">
                             <Icon icon="radix-icons:arrow-up" />
                         </button>
-                        <button
-                            @click="doClear()"
-                            v-tooltip="'清空输入'"
-                            class="icon"
-                            :class="{ disabled: inputText?.length == '' }"
-                        >
+                        <button @click="doClear()" v-tooltip="'清空输入'" class="icon"
+                            :class="{ disabled: inputText?.length || 0 == 0 }">
                             <Icon icon="radix-icons:crumpled-paper" />
                         </button>
                     </div>
                     <div class="button-group">
-                        <button @click="toPng" v-tooltip="`导出 PNG 图片`">
+                        <button @click="() => toPng()" v-tooltip="`导出 PNG 图片`">
                             <Icon icon="fluent:image-16-regular" />
                         </button>
                         <button @click="toPng({ scale: 2 })" v-tooltip="`导出 PNG 图片（2X）`">
@@ -61,8 +45,8 @@
                 </div>
                 <div class="line more-options">
                     <select v-model="inputParser" class="parser-select" v-tooltip="`提示词语法类型`">
-                        <option value="midjourney">Midjourney</option>
                         <option value="stable-diffusion-webui">stable-diffusion-webui</option>
+                        <option value="midjourney">Midjourney</option>
                     </select>
                     <button @click="doDeleteWorkspace()" v-tooltip="`删除工作区`" class="icon">
                         <Icon icon="radix-icons:trash" />
@@ -71,11 +55,8 @@
             </div>
         </div>
         <div class="main" ref="main">
-            <div
-                class="PromptListArea Area"
-                :class="[promptWork.groups.length <= 1 ? 'noGroup' : 'hasGroup']"
-                @contextmenu.prevent
-            >
+            <div class="PromptListArea Area" :class="[promptWork.groups.length <= 1 ? 'noGroup' : 'hasGroup']"
+                @contextmenu.prevent>
                 <div class="PromptGroup" v-for="group in promptWork.groups">
                     <div class="PromptGroupTitle" v-if="promptWork.groups.length > 1">
                         <div class="name">
@@ -83,36 +64,23 @@
                             <span class="groupLv" v-if="group.groupLv && group.groupLv != 1">{{ group.groupLv }}</span>
                         </div>
                     </div>
-                    <PromptList
-                        v-for="promptList in group.lists"
-                        :key="promptList.data.id"
-                        :list="promptList"
-                        @update="doExportPrompt()"
-                    >
+                    <PromptList v-for="promptList in group.lists" :key="promptList.data.id" :list="promptList"
+                        @update="doExportPrompt()">
                         <div class="name-bar">
                             <div class="name" :class="[`type-${promptList.data.id}`]" :title="promptList.data.name">
                                 <span class="content">{{ promptList.data.name ?? promptList.data.id }}</span>
                             </div>
                         </div>
-                        <div
-                            class="list PromptList-list"
-                            @dblclick="
-                                onPromptListDblick($event, promptList, {
-                                    group: group.id,
-                                    lv: group.groupLv,
-                                    subType: promptList.data.id,
-                                })
-                            "
-                        >
-                            <PromptItem
-                                @click="onItemClick(item)"
-                                @update="onItemUpdate(item)"
-                                @contextmenu="doOpenItemMenu($event, promptList)"
-                                v-for="item in promptList.items"
-                                :item="item"
-                                :list="promptList"
-                                :key="item.data.word.id"
-                            />
+                        <div class="list PromptList-list" @dblclick="
+                            onPromptListDblick($event, promptList, {
+                                group: group.id,
+                                lv: group.groupLv,
+                                subType: promptList.data.id,
+                            })
+                        ">
+                            <PromptItem @click="onItemClick(item)" @update="onItemUpdate(item)"
+                                @contextmenu="doOpenItemMenu($event, promptList)" v-for="item in promptList.items"
+                                :item="item" :list="promptList" :key="item.data.word.id" />
                         </div>
                     </PromptList>
                 </div>
@@ -137,6 +105,7 @@
             margin-bottom: 8px;
             margin-top: 8px;
             font-family: "JetBrains Mono";
+
             .name {
                 display: inline-flex;
                 border-radius: 3px;
@@ -145,6 +114,7 @@
                 color: #757985a3;
                 text-shadow: 0 1px #ffffff7d;
                 align-items: center;
+
                 .groupLv {
                     display: inline-flex;
                     align-items: center;
@@ -173,7 +143,8 @@
 
     .PromptList {
         display: flex;
-        > .list {
+
+        >.list {
             display: flex;
             flex-wrap: wrap;
             align-items: flex-end;
@@ -182,7 +153,8 @@
             width: 100%;
             min-height: 36px;
         }
-        > .name-bar {
+
+        >.name-bar {
             width: var(--margin-left);
             text-align: right;
             padding-right: var(--padding-2);
@@ -192,6 +164,7 @@
             display: flex;
             place-content: flex-end;
             color: #9a9a9a;
+
             .name {
                 padding-top: var(--padding-2);
                 background: transparent;
@@ -214,25 +187,32 @@
             }
         }
     }
+
     .noGroup .PromptList {
         padding: var(--padding-1) 0;
     }
+
     .hasGroup .PromptList {
         .name-bar {
             .name {
                 width: 5px;
+
                 .content {
                     display: none;
                 }
+
                 &.type-normal {
                     background: #cecece;
                 }
+
                 &.type-style {
                     background: #9ec9c6;
                 }
+
                 &.type-quality {
                     background: #939bbd;
                 }
+
                 &.type-command {
                     background: #d6d3ec;
                 }
@@ -243,10 +223,12 @@
             border-radius: 4px 4px 0 0;
             margin-top: 4px;
         }
+
         &:last-of-type .name-bar .name {
             border-radius: 0 0 4px 4px;
             margin-bottom: 4px;
         }
+
         &:last-of-type:nth-of-type(2) .name-bar .name {
             border-radius: 4px;
             margin-bottom: 4px;
@@ -261,9 +243,10 @@
         width: 320px;
         margin-left: 20px;
 
-        > * {
+        >* {
             transition: all 0.2s ease;
         }
+
         .output {
             position: relative;
             z-index: 2;
@@ -278,6 +261,7 @@
             word-wrap: break-word;
             margin-top: 8px;
             min-height: 1em;
+
             .pl {
                 color: #7a8b7e;
             }
@@ -290,10 +274,12 @@
             align-items: flex-start;
             flex-direction: column;
             flex: auto;
+
             .line {
                 display: flex;
                 gap: 6px;
             }
+
             button {
                 display: inline-flex;
                 background: #e9e9e9;
@@ -304,13 +290,16 @@
                 &:hover {
                     background: #d6d6d6;
                 }
+
                 &:active {
                     background: #bebcbc;
                 }
+
                 &.icon {
                     padding: 6px 9px;
                 }
             }
+
             .button-group {
                 display: flex;
                 align-items: center;
@@ -320,14 +309,17 @@
                 height: 2.3em;
                 padding: 0 4px;
                 font-size: var(--font-size-1);
+
                 button {
                     padding: 4px;
                     height: 1.8em;
                     width: 1.8em;
+
                     .iconify {
                         margin-right: 0;
                         font-size: var(--font-size-2);
                     }
+
                     &.disabled {
                         opacity: 0.4;
                         pointer-events: none;
@@ -342,6 +334,7 @@
 
             .more-options {
                 margin-top: auto;
+
                 .parser-select {
                     margin-left: auto;
                     width: auto;
@@ -350,14 +343,17 @@
             }
         }
     }
+
     .WorkInfoArea {
         display: flex;
         flex-direction: column;
         margin-bottom: 8px;
+
         .WorkName {
             margin-left: -4px;
             margin-bottom: 4px;
             display: flex;
+
             input {
                 border: none;
                 background: transparent;
@@ -369,6 +365,7 @@
                 font-weight: 600;
                 width: calc(100% + -6px);
                 flex: none;
+
                 &:focus-visible {
                     outline: none;
                     box-shadow: 0 0 0 2px rgb(182 179 179);
@@ -376,6 +373,7 @@
             }
         }
     }
+
     textarea {
         border: none;
         background: #e9e9e9;
@@ -387,6 +385,7 @@
         resize: none;
         word-break: break-all;
         box-shadow: 0 0 0 2px #bdb8b880;
+
         &:focus,
         &:focus-visible {
             outline: none;
@@ -398,6 +397,7 @@
             height: 12px;
             background-color: #aaa0;
         }
+
         &::-webkit-scrollbar-thumb {
             background: #838383;
             border-radius: 29px;
@@ -439,21 +439,21 @@ export default Vue.extend({
         return {
             inputText: "",
             outputText: "",
-            inputParser: this.promptWork?.data?.parser ?? "midjourney",
+            inputParser: this.promptWork?.data?.parser ?? "stable-diffusion-webui",
             isPNGExporting: false,
         }
     },
     created() {
-        ;(<any>this).doImportByInputThrottle = debounce(
+        ; (<any>this).doImportByInputThrottle = debounce(
             () => {
                 this.doImportByInput()
             },
             30,
             { maxWait: 50 }
         )
-        ;(<any>this).doAddInputDebounce = debounce(() => {
-            this.doImportByInputThrottle()
-        }, 300)
+            ; (<any>this).doAddInputDebounce = debounce(() => {
+                this.doImportByInputThrottle()
+            }, 300)
         this.inputText = this.promptWork.data.initText ?? ""
         this.doImportByInputThrottle()
     },
@@ -464,7 +464,7 @@ export default Vue.extend({
         },
     },
     methods: {
-        doImportByInputThrottle() {},
+        doImportByInputThrottle() { },
         async doImportByInput() {
             console.log("[doImportByInput]")
             await this.promptWork.importPrompts(this.inputText, { parser: <any>this.inputParser })
@@ -476,12 +476,12 @@ export default Vue.extend({
         },
         async onUserInput() {
             setTimeout(() => {
-                ;(<any>this).doImportByInputThrottle()
+                ; (<any>this).doImportByInputThrottle()
             }, 0)
         },
         async onUserInputDebounce() {
             // console.log("[onUserInputDebounce]")
-            ;(<any>this).doAddInputDebounce()
+            ; (<any>this).doAddInputDebounce()
         },
         async doClear() {
             this.inputText = ""
@@ -554,7 +554,7 @@ export default Vue.extend({
         },
 
         doOpenItemMenu(options: { item: PromptItem; el: any; event: any }, promptList: PromptList) {
-            ;(this.$refs as any).menu.open({ ...options, promptList })
+            ; (this.$refs as any).menu.open({ ...options, promptList })
         },
 
         onWorkClick() {
